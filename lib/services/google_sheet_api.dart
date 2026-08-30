@@ -18,9 +18,11 @@ class GoogleSheetApi {
       Uri.parse('${_url.toString()}?token=${Uri.encodeComponent(AppConfig.apiToken)}'),
     ).timeout(const Duration(seconds: 20));
 
-    if (response.statusCode != 200) {
-      throw Exception('Google Sheets returned HTTP ${response.statusCode}');
-    }
+    if (response.statusCode != 200 && response.statusCode != 302) {
+  throw Exception(
+    "HTTP ${response.statusCode}: ${response.body}"
+  );
+}
 
     final decoded = jsonDecode(response.body);
     if (decoded is! List) {
