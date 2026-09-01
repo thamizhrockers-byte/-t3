@@ -14,8 +14,7 @@ class Dashboard extends StatefulWidget {
   State<Dashboard> createState() => _DashboardState();
 }
 
-class _DashboardState extends State<Dashboard>
-    with WidgetsBindingObserver {
+class _DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   static const List<String> _periods = [
     'This Month',
     'Last Month',
@@ -120,11 +119,11 @@ class _DashboardState extends State<Dashboard>
         error = e.toString();
       });
     } finally {
-      if (!mounted) return;
-
-      setState(() {
-        loading = false;
-      });
+      if (mounted) {
+        setState(() {
+          loading = false;
+        });
+      }
     }
   }
 
@@ -144,9 +143,7 @@ class _DashboardState extends State<Dashboard>
   }
 
   Future<void> _checkDetectedPayments() async {
-    if (!mounted ||
-        !notificationAccessEnabled ||
-        _checkingDetectedPayments) {
+    if (!mounted || !notificationAccessEnabled || _checkingDetectedPayments) {
       return;
     }
 
@@ -190,17 +187,13 @@ class _DashboardState extends State<Dashboard>
       text: 'Auto-detected from ${payment.sourceApp}',
     );
 
-    String type = payment.transaction == 'Received'
-        ? 'Received'
-        : 'Paid';
+    String type = payment.transaction == 'Received' ? 'Received' : 'Paid';
 
     String category = 'Others';
 
     String bank = 'Unknown';
 
-    String mode = _modes.contains(payment.mode)
-        ? payment.mode
-        : 'Unknown';
+    String mode = _modes.contains(payment.mode) ? payment.mode : 'Unknown';
 
     String? validationError;
 
@@ -267,7 +260,6 @@ class _DashboardState extends State<Dashboard>
                         ),
                       ),
                       const SizedBox(height: 14),
-
                       DropdownButtonFormField<String>(
                         initialValue: type,
                         decoration: const InputDecoration(
@@ -290,13 +282,10 @@ class _DashboardState extends State<Dashboard>
                           }
                         },
                       ),
-
                       const SizedBox(height: 12),
-
                       TextField(
                         controller: amountController,
-                        keyboardType:
-                            const TextInputType.numberWithOptions(
+                        keyboardType: const TextInputType.numberWithOptions(
                           decimal: true,
                         ),
                         decoration: const InputDecoration(
@@ -305,9 +294,7 @@ class _DashboardState extends State<Dashboard>
                           border: OutlineInputBorder(),
                         ),
                       ),
-
                       const SizedBox(height: 12),
-
                       TextField(
                         controller: toController,
                         decoration: const InputDecoration(
@@ -315,9 +302,7 @@ class _DashboardState extends State<Dashboard>
                           border: OutlineInputBorder(),
                         ),
                       ),
-
                       const SizedBox(height: 12),
-
                       DropdownButtonFormField<String>(
                         initialValue: category,
                         decoration: const InputDecoration(
@@ -338,9 +323,7 @@ class _DashboardState extends State<Dashboard>
                           }
                         },
                       ),
-
                       const SizedBox(height: 12),
-
                       DropdownButtonFormField<String>(
                         initialValue: bank,
                         decoration: const InputDecoration(
@@ -361,9 +344,7 @@ class _DashboardState extends State<Dashboard>
                           }
                         },
                       ),
-
                       const SizedBox(height: 12),
-
                       DropdownButtonFormField<String>(
                         initialValue: mode,
                         decoration: const InputDecoration(
@@ -384,9 +365,7 @@ class _DashboardState extends State<Dashboard>
                           }
                         },
                       ),
-
                       const SizedBox(height: 12),
-
                       TextField(
                         controller: notesController,
                         maxLines: 2,
@@ -395,7 +374,6 @@ class _DashboardState extends State<Dashboard>
                           border: OutlineInputBorder(),
                         ),
                       ),
-
                       if (validationError != null) ...[
                         const SizedBox(height: 10),
                         Text(
@@ -406,9 +384,7 @@ class _DashboardState extends State<Dashboard>
                           ),
                         ),
                       ],
-
                       const SizedBox(height: 12),
-
                       ExpansionTile(
                         tilePadding: EdgeInsets.zero,
                         childrenPadding: EdgeInsets.zero,
@@ -449,9 +425,7 @@ class _DashboardState extends State<Dashboard>
                 FilledButton(
                   onPressed: () {
                     final amount = double.tryParse(
-                      amountController.text
-                          .trim()
-                          .replaceAll(',', ''),
+                      amountController.text.trim().replaceAll(',', ''),
                     );
 
                     if (amount == null || amount <= 0) {
@@ -463,8 +437,7 @@ class _DashboardState extends State<Dashboard>
 
                     if (toController.text.trim().isEmpty) {
                       setDialogState(() {
-                        validationError =
-                            'Enter the recipient or sender.';
+                        validationError = 'Enter the recipient or sender.';
                       });
                       return;
                     }
@@ -599,8 +572,7 @@ class _DashboardState extends State<Dashboard>
     final now = DateTime.now();
 
     if (selectedPeriod == 'This Month') {
-      return date.year == now.year &&
-          date.month == now.month;
+      return date.year == now.year && date.month == now.month;
     }
 
     if (selectedPeriod == 'Last Month') {
@@ -627,9 +599,8 @@ class _DashboardState extends State<Dashboard>
   List<TransactionModel> get analyticsRows =>
       filteredRows.where(_isCompleted).toList();
 
-  double get totalPaid => analyticsRows
-      .where(_isPaid)
-      .fold(0.0, (sum, item) => sum + item.amount);
+  double get totalPaid =>
+      analyticsRows.where(_isPaid).fold(0.0, (sum, item) => sum + item.amount);
 
   double get totalReceived => analyticsRows
       .where(_isReceived)
@@ -658,16 +629,12 @@ class _DashboardState extends State<Dashboard>
   }
 
   Map<String, double> get categoryData => _aggregatePaidBy(
-        (item) => item.category.trim().isEmpty
-            ? 'Others'
-            : item.category,
+        (item) => item.category.trim().isEmpty ? 'Others' : item.category,
       );
 
-  Map<String, double> get bankData =>
-      _aggregatePaidBy((item) => item.bank);
+  Map<String, double> get bankData => _aggregatePaidBy((item) => item.bank);
 
-  Map<String, double> get modeData =>
-      _aggregatePaidBy((item) => item.mode);
+  Map<String, double> get modeData => _aggregatePaidBy((item) => item.mode);
 
   double _paidForMonth(int year, int month) {
     return rows.where((item) {
@@ -677,9 +644,7 @@ class _DashboardState extends State<Dashboard>
 
       final date = _dateOf(item);
 
-      return date != null &&
-          date.year == year &&
-          date.month == month;
+      return date != null && date.year == year && date.month == month;
     }).fold(
       0.0,
       (sum, item) => sum + item.amount,
@@ -714,8 +679,7 @@ class _DashboardState extends State<Dashboard>
     TransactionModel? largest;
 
     for (final item in analyticsRows.where(_isPaid)) {
-      if (largest == null ||
-          item.amount > largest.amount) {
+      if (largest == null || item.amount > largest.amount) {
         largest = item;
       }
     }
@@ -755,8 +719,7 @@ class _DashboardState extends State<Dashboard>
     return points;
   }
 
-  Color colorForIndex(int index) =>
-      chartColors[index % chartColors.length];
+  Color colorForIndex(int index) => chartColors[index % chartColors.length];
 
   String money(double value) {
     final formatted = NumberFormat.decimalPattern(
@@ -841,8 +804,7 @@ class _DashboardState extends State<Dashboard>
               : RefreshIndicator(
                   onRefresh: load,
                   child: ListView(
-                    physics:
-                        const AlwaysScrollableScrollPhysics(),
+                    physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.fromLTRB(
                       16,
                       4,
@@ -908,9 +870,7 @@ class _DashboardState extends State<Dashboard>
               notificationAccessEnabled
                   ? Icons.auto_awesome_rounded
                   : Icons.notifications_active_outlined,
-              color: notificationAccessEnabled
-                  ? Colors.green
-                  : primary,
+              color: notificationAccessEnabled ? Colors.green : primary,
               size: 20,
             ),
           ),
@@ -966,18 +926,16 @@ class _DashboardState extends State<Dashboard>
       children: [
         Text(
           'Overview',
-          style:
-              Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
         ),
         const SizedBox(height: 8),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
             children: _periods.map((period) {
-              final selected =
-                  selectedPeriod == period;
+              final selected = selectedPeriod == period;
 
               return Padding(
                 padding: const EdgeInsets.only(
@@ -1085,8 +1043,7 @@ class _DashboardState extends State<Dashboard>
           children: [
             CircleAvatar(
               radius: 18,
-              backgroundColor:
-                  iconColor.withValues(alpha: 0.12),
+              backgroundColor: iconColor.withValues(alpha: 0.12),
               child: Icon(
                 icon,
                 color: iconColor,
@@ -1119,8 +1076,7 @@ class _DashboardState extends State<Dashboard>
 
   Widget _balanceCard() {
     final positive = balance >= 0;
-    final color =
-        positive ? Colors.green : Colors.red;
+    final color = positive ? Colors.green : Colors.red;
 
     return Card(
       elevation: 0,
@@ -1134,12 +1090,10 @@ class _DashboardState extends State<Dashboard>
           children: [
             CircleAvatar(
               radius: 23,
-              backgroundColor:
-                  color.withValues(alpha: 0.12),
+              backgroundColor: color.withValues(alpha: 0.12),
               child: Icon(
                 positive
-                    ? Icons
-                        .account_balance_wallet_rounded
+                    ? Icons.account_balance_wallet_rounded
                     : Icons.warning_rounded,
                 color: color,
               ),
@@ -1147,8 +1101,7 @@ class _DashboardState extends State<Dashboard>
             const SizedBox(width: 14),
             Expanded(
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Balance · $selectedPeriod',
@@ -1190,8 +1143,7 @@ class _DashboardState extends State<Dashboard>
     Color color;
 
     if (previous == 0 && current == 0) {
-      message =
-          'No spending recorded in either month';
+      message = 'No spending recorded in either month';
       icon = Icons.remove_rounded;
       color = Colors.blueGrey;
     } else if (previous == 0) {
@@ -1199,17 +1151,14 @@ class _DashboardState extends State<Dashboard>
       icon = Icons.trending_up_rounded;
       color = Colors.orange;
     } else {
-      final change =
-          ((current - previous) / previous) * 100;
+      final change = ((current - previous) / previous) * 100;
 
       if (change > 0.5) {
-        message =
-            '${change.abs().toStringAsFixed(0)}% higher than last month';
+        message = '${change.abs().toStringAsFixed(0)}% higher than last month';
         icon = Icons.trending_up_rounded;
         color = Colors.red;
       } else if (change < -0.5) {
-        message =
-            '${change.abs().toStringAsFixed(0)}% lower than last month';
+        message = '${change.abs().toStringAsFixed(0)}% lower than last month';
         icon = Icons.trending_down_rounded;
         color = Colors.green;
       } else {
@@ -1231,8 +1180,7 @@ class _DashboardState extends State<Dashboard>
           children: [
             CircleAvatar(
               radius: 21,
-              backgroundColor:
-                  color.withValues(alpha: 0.12),
+              backgroundColor: color.withValues(alpha: 0.12),
               child: Icon(
                 icon,
                 color: color,
@@ -1241,8 +1189,7 @@ class _DashboardState extends State<Dashboard>
             const SizedBox(width: 12),
             Expanded(
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'This month spending',
@@ -1272,8 +1219,7 @@ class _DashboardState extends State<Dashboard>
               ),
             ),
             Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
                   'Last month',
@@ -1307,25 +1253,18 @@ class _DashboardState extends State<Dashboard>
             icon: Icons.auto_awesome_rounded,
             title: 'Top Category',
             value: category?.key ?? '—',
-            subtitle: category == null
-                ? 'No expenses'
-                : money(category.value),
+            subtitle: category == null ? 'No expenses' : money(category.value),
           ),
         ),
         const SizedBox(width: 10),
         Expanded(
           child: _insightCard(
-            icon:
-                Icons.local_fire_department_rounded,
+            icon: Icons.local_fire_department_rounded,
             title: 'Largest Expense',
-            value: largest == null
-                ? '—'
-                : money(largest.amount),
+            value: largest == null ? '—' : money(largest.amount),
             subtitle: largest == null
                 ? 'No expenses'
-                : (largest.to.trim().isEmpty
-                    ? 'Unknown'
-                    : largest.to.trim()),
+                : (largest.to.trim().isEmpty ? 'Unknown' : largest.to.trim()),
           ),
         ),
       ],
@@ -1338,8 +1277,7 @@ class _DashboardState extends State<Dashboard>
     required String value,
     required String subtitle,
   }) {
-    final primary =
-        Theme.of(context).colorScheme.primary;
+    final primary = Theme.of(context).colorScheme.primary;
 
     return Card(
       elevation: 0,
@@ -1394,11 +1332,9 @@ class _DashboardState extends State<Dashboard>
   Widget _categoryChart() {
     return _donutCard(
       title: 'Spending by Category',
-      subtitle:
-          '$selectedPeriod · Where your money is going',
+      subtitle: '$selectedPeriod · Where your money is going',
       data: categoryData,
-      emptyText:
-          'No category spending for this period',
+      emptyText: 'No category spending for this period',
       height: 220,
     );
   }
@@ -1406,11 +1342,9 @@ class _DashboardState extends State<Dashboard>
   Widget _paymentModeChart() {
     return _donutCard(
       title: 'Payment Modes',
-      subtitle:
-          '$selectedPeriod · UPI, cash, card and more',
+      subtitle: '$selectedPeriod · UPI, cash, card and more',
       data: modeData,
-      emptyText:
-          'No payment-mode spending for this period',
+      emptyText: 'No payment-mode spending for this period',
       height: 200,
     );
   }
@@ -1429,8 +1363,7 @@ class _DashboardState extends State<Dashboard>
         borderRadius: BorderRadius.circular(18),
       ),
       child: Padding(
-        padding:
-            const EdgeInsets.fromLTRB(16, 16, 16, 14),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1463,11 +1396,7 @@ class _DashboardState extends State<Dashboard>
                         PieChartData(
                           centerSpaceRadius: 40,
                           sectionsSpace: 2,
-                          sections: data.entries
-                              .toList()
-                              .asMap()
-                              .entries
-                              .map(
+                          sections: data.entries.toList().asMap().entries.map(
                             (entry) {
                               return PieChartSectionData(
                                 value: entry.value.value,
@@ -1486,15 +1415,10 @@ class _DashboardState extends State<Dashboard>
                     Expanded(
                       flex: 5,
                       child: ListView(
-                        children: data.entries
-                            .toList()
-                            .asMap()
-                            .entries
-                            .map(
+                        children: data.entries.toList().asMap().entries.map(
                           (entry) {
                             return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                 vertical: 4,
                               ),
                               child: Row(
@@ -1502,25 +1426,19 @@ class _DashboardState extends State<Dashboard>
                                   Container(
                                     width: 10,
                                     height: 10,
-                                    decoration:
-                                        BoxDecoration(
-                                      color:
-                                          colorForIndex(
+                                    decoration: BoxDecoration(
+                                      color: colorForIndex(
                                         entry.key,
                                       ),
-                                      shape:
-                                          BoxShape.circle,
+                                      shape: BoxShape.circle,
                                     ),
                                   ),
                                   const SizedBox(width: 7),
                                   Expanded(
                                     child: Text(
                                       entry.value.key,
-                                      overflow:
-                                          TextOverflow
-                                              .ellipsis,
-                                      style:
-                                          const TextStyle(
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
                                         fontSize: 12,
                                       ),
                                     ),
@@ -1529,12 +1447,9 @@ class _DashboardState extends State<Dashboard>
                                     money(
                                       entry.value.value,
                                     ),
-                                    style:
-                                        const TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 11,
-                                      fontWeight:
-                                          FontWeight
-                                              .w600,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                 ],
@@ -1558,15 +1473,12 @@ class _DashboardState extends State<Dashboard>
 
     final maxAmount = data.fold<double>(
       0,
-      (max, item) =>
-          item.amount > max ? item.amount : max,
+      (max, item) => item.amount > max ? item.amount : max,
     );
 
-    final maxY =
-        maxAmount <= 0 ? 1.0 : maxAmount * 1.2;
+    final maxY = maxAmount <= 0 ? 1.0 : maxAmount * 1.2;
 
-    final primary =
-        Theme.of(context).colorScheme.primary;
+    final primary = Theme.of(context).colorScheme.primary;
 
     return Card(
       elevation: 0,
@@ -1575,8 +1487,7 @@ class _DashboardState extends State<Dashboard>
         borderRadius: BorderRadius.circular(18),
       ),
       child: Padding(
-        padding:
-            const EdgeInsets.fromLTRB(16, 16, 16, 12),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1601,62 +1512,49 @@ class _DashboardState extends State<Dashboard>
               child: LineChart(
                 LineChartData(
                   minX: 0,
-                  maxX:
-                      (data.length - 1).toDouble(),
+                  maxX: (data.length - 1).toDouble(),
                   minY: 0,
                   maxY: maxY,
-                  borderData:
-                      FlBorderData(show: false),
+                  borderData: FlBorderData(show: false),
                   gridData: FlGridData(
                     show: true,
                     drawVerticalLine: false,
-                    getDrawingHorizontalLine: (_) =>
-                        FlLine(
-                      color: Colors.grey
-                          .withValues(alpha: 0.15),
+                    getDrawingHorizontalLine: (_) => FlLine(
+                      color: Colors.grey.withValues(alpha: 0.15),
                       strokeWidth: 1,
                     ),
                   ),
                   titlesData: FlTitlesData(
                     topTitles: const AxisTitles(
-                      sideTitles:
-                          SideTitles(showTitles: false),
+                      sideTitles: SideTitles(showTitles: false),
                     ),
                     rightTitles: const AxisTitles(
-                      sideTitles:
-                          SideTitles(showTitles: false),
+                      sideTitles: SideTitles(showTitles: false),
                     ),
                     leftTitles: const AxisTitles(
-                      sideTitles:
-                          SideTitles(showTitles: false),
+                      sideTitles: SideTitles(showTitles: false),
                     ),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
                         reservedSize: 28,
                         interval: 1,
-                        getTitlesWidget:
-                            (value, meta) {
-                          final index =
-                              value.round();
+                        getTitlesWidget: (value, meta) {
+                          final index = value.round();
 
-                          if (index < 0 ||
-                              index >= data.length) {
-                            return const SizedBox
-                                .shrink();
+                          if (index < 0 || index >= data.length) {
+                            return const SizedBox.shrink();
                           }
 
                           return Padding(
-                            padding:
-                                const EdgeInsets.only(
+                            padding: const EdgeInsets.only(
                               top: 6,
                             ),
                             child: Text(
                               DateFormat('MMM').format(
                                 data[index].date,
                               ),
-                              style:
-                                  const TextStyle(
+                              style: const TextStyle(
                                 fontSize: 10,
                               ),
                             ),
@@ -1716,8 +1614,7 @@ class _DashboardState extends State<Dashboard>
         borderRadius: BorderRadius.circular(18),
       ),
       child: Padding(
-        padding:
-            const EdgeInsets.fromLTRB(16, 16, 16, 12),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1743,29 +1640,23 @@ class _DashboardState extends State<Dashboard>
                 BarChartData(
                   maxY: maxValue * 1.25,
                   minY: 0,
-                  borderData:
-                      FlBorderData(show: false),
-                  gridData:
-                      const FlGridData(show: false),
+                  borderData: FlBorderData(show: false),
+                  gridData: const FlGridData(show: false),
                   titlesData: FlTitlesData(
                     topTitles: const AxisTitles(
-                      sideTitles:
-                          SideTitles(showTitles: false),
+                      sideTitles: SideTitles(showTitles: false),
                     ),
                     rightTitles: const AxisTitles(
-                      sideTitles:
-                          SideTitles(showTitles: false),
+                      sideTitles: SideTitles(showTitles: false),
                     ),
                     leftTitles: const AxisTitles(
-                      sideTitles:
-                          SideTitles(showTitles: false),
+                      sideTitles: SideTitles(showTitles: false),
                     ),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
                         reservedSize: 28,
-                        getTitlesWidget:
-                            (value, meta) {
+                        getTitlesWidget: (value, meta) {
                           if (value == 0) {
                             return const Text(
                               'Received',
@@ -1784,8 +1675,7 @@ class _DashboardState extends State<Dashboard>
                             );
                           }
 
-                          return const SizedBox
-                              .shrink();
+                          return const SizedBox.shrink();
                         },
                       ),
                     ),
@@ -1797,8 +1687,7 @@ class _DashboardState extends State<Dashboard>
                         BarChartRodData(
                           toY: totalReceived,
                           width: 42,
-                          borderRadius:
-                              BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(8),
                           color: Colors.green,
                         ),
                       ],
@@ -1809,8 +1698,7 @@ class _DashboardState extends State<Dashboard>
                         BarChartRodData(
                           toY: totalPaid,
                           width: 42,
-                          borderRadius:
-                              BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(8),
                           color: Colors.red,
                         ),
                       ],
@@ -1826,8 +1714,7 @@ class _DashboardState extends State<Dashboard>
   }
 
   Widget _bankChart() {
-    final entries =
-        bankData.entries.take(5).toList();
+    final entries = bankData.entries.take(5).toList();
 
     return Card(
       elevation: 0,
@@ -1836,8 +1723,7 @@ class _DashboardState extends State<Dashboard>
         borderRadius: BorderRadius.circular(18),
       ),
       child: Padding(
-        padding:
-            const EdgeInsets.fromLTRB(16, 16, 16, 12),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1866,29 +1752,24 @@ class _DashboardState extends State<Dashboard>
                 height: 175,
                 child: BarChart(
                   BarChartData(
-                    maxY:
-                        entries.first.value * 1.25,
+                    maxY: entries.first.value * 1.25,
                     minY: 0,
-                    borderData:
-                        FlBorderData(show: false),
+                    borderData: FlBorderData(show: false),
                     gridData: const FlGridData(
                       show: false,
                     ),
                     titlesData: FlTitlesData(
-                      topTitles:
-                          const AxisTitles(
+                      topTitles: const AxisTitles(
                         sideTitles: SideTitles(
                           showTitles: false,
                         ),
                       ),
-                      rightTitles:
-                          const AxisTitles(
+                      rightTitles: const AxisTitles(
                         sideTitles: SideTitles(
                           showTitles: false,
                         ),
                       ),
-                      leftTitles:
-                          const AxisTitles(
+                      leftTitles: const AxisTitles(
                         sideTitles: SideTitles(
                           showTitles: false,
                         ),
@@ -1897,22 +1778,15 @@ class _DashboardState extends State<Dashboard>
                         sideTitles: SideTitles(
                           showTitles: true,
                           reservedSize: 30,
-                          getTitlesWidget:
-                              (value, meta) {
-                            final index =
-                                value.toInt();
+                          getTitlesWidget: (value, meta) {
+                            final index = value.toInt();
 
-                            if (index < 0 ||
-                                index >=
-                                    entries.length) {
-                              return const SizedBox
-                                  .shrink();
+                            if (index < 0 || index >= entries.length) {
+                              return const SizedBox.shrink();
                             }
 
                             return Padding(
-                              padding:
-                                  const EdgeInsets
-                                      .only(
+                              padding: const EdgeInsets.only(
                                 top: 6,
                               ),
                               child: Text(
@@ -1920,8 +1794,7 @@ class _DashboardState extends State<Dashboard>
                                   entries[index].key,
                                   max: 9,
                                 ),
-                                style:
-                                    const TextStyle(
+                                style: const TextStyle(
                                   fontSize: 9,
                                 ),
                               ),
@@ -1930,21 +1803,15 @@ class _DashboardState extends State<Dashboard>
                         ),
                       ),
                     ),
-                    barGroups: entries
-                        .asMap()
-                        .entries
-                        .map(
+                    barGroups: entries.asMap().entries.map(
                       (entry) {
                         return BarChartGroupData(
                           x: entry.key,
                           barRods: [
                             BarChartRodData(
-                              toY:
-                                  entry.value.value,
+                              toY: entry.value.value,
                               width: 24,
-                              borderRadius:
-                                  BorderRadius
-                                      .circular(7),
+                              borderRadius: BorderRadius.circular(7),
                               color: colorForIndex(
                                 entry.key,
                               ),
@@ -1979,8 +1846,7 @@ class _DashboardState extends State<Dashboard>
   }
 
   Widget _recentTransactions() {
-    final recent =
-        filteredRows.reversed.take(12).toList();
+    final recent = filteredRows.reversed.take(12).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2037,19 +1903,15 @@ class _DashboardState extends State<Dashboard>
   ) {
     final paid = _isPaid(item);
 
-    final status = item.status.trim().isEmpty
-        ? 'Completed'
-        : item.status.trim();
+    final status =
+        item.status.trim().isEmpty ? 'Completed' : item.status.trim();
 
-    final completed =
-        status.toLowerCase() == 'completed';
+    final completed = status.toLowerCase() == 'completed';
 
     final mode = item.mode.trim();
 
     final category =
-        item.category.trim().isEmpty
-            ? 'Others'
-            : item.category.trim();
+        item.category.trim().isEmpty ? 'Others' : item.category.trim();
 
     final bank = item.bank.trim();
 
@@ -2069,28 +1931,21 @@ class _DashboardState extends State<Dashboard>
         borderRadius: BorderRadius.circular(15),
       ),
       child: ListTile(
-        contentPadding:
-            const EdgeInsets.symmetric(
+        contentPadding: const EdgeInsets.symmetric(
           horizontal: 14,
           vertical: 4,
         ),
         leading: CircleAvatar(
           backgroundColor:
-              (paid ? Colors.red : Colors.green)
-                  .withValues(alpha: 0.10),
+              (paid ? Colors.red : Colors.green).withValues(alpha: 0.10),
           child: Icon(
-            paid
-                ? Icons.north_east_rounded
-                : Icons.south_west_rounded,
-            color:
-                paid ? Colors.red : Colors.green,
+            paid ? Icons.north_east_rounded : Icons.south_west_rounded,
+            color: paid ? Colors.red : Colors.green,
             size: 20,
           ),
         ),
         title: Text(
-          item.to.trim().isEmpty
-              ? 'Unknown'
-              : item.to.trim(),
+          item.to.trim().isEmpty ? 'Unknown' : item.to.trim(),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(
@@ -2098,8 +1953,7 @@ class _DashboardState extends State<Dashboard>
           ),
         ),
         subtitle: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 2),
             Text(
@@ -2124,8 +1978,7 @@ class _DashboardState extends State<Dashboard>
         trailing: Text(
           '${paid ? '-' : '+'}${money(item.amount)}',
           style: TextStyle(
-            color:
-                paid ? Colors.red : Colors.green,
+            color: paid ? Colors.red : Colors.green,
             fontWeight: FontWeight.bold,
             fontSize: 14,
           ),
